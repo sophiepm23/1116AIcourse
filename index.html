@@ -64,6 +64,158 @@
       background-size: 160px 160px, 120px 120px, 20px 20px, 20px 20px;
       background-position: 40px 0, 0 50px, 0 0, 0 0;
     }
+    /* Hero 3D 門市場景：以透視、景深和立體人物營造進出店門的動態 */
+    .people-scene {
+      background: linear-gradient(to top, rgba(42,27,17,.72), transparent);
+      perspective: 760px;
+      perspective-origin: 72% 100%;
+      transform-style: preserve-3d;
+      mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+      -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+    }
+    .scene-floor {
+      position: absolute;
+      left: -36%; right: -36%; bottom: -115px;
+      height: 215px;
+      transform: rotateX(67deg) translateZ(-42px);
+      transform-origin: bottom center;
+      background-color: rgba(74,50,34,.70);
+      background-image:
+        linear-gradient(rgba(253,251,247,.17) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(253,251,247,.14) 1px, transparent 1px);
+      background-size: 42px 42px;
+      box-shadow: 0 -14px 30px rgba(0,0,0,.2);
+    }
+    .shop-3d {
+      position: absolute;
+      right: 8%; bottom: 32px;
+      width: 142px; height: 122px;
+      z-index: 2;
+      transform-style: preserve-3d;
+      transform: rotateY(-19deg) rotateX(3deg);
+    }
+    .shop-front, .shop-side, .shop-awning { position:absolute; transform-style:preserve-3d; }
+    .shop-front {
+      inset: 12px 0 0;
+      border: 3px solid rgba(240,179,124,.68);
+      background: linear-gradient(130deg, #7A5638, #3A2619 72%);
+      box-shadow: inset 0 0 28px rgba(0,0,0,.42), 0 14px 22px rgba(0,0,0,.26);
+      transform: translateZ(15px);
+    }
+    .shop-side {
+      top: 12px; right: -28px; width: 28px; height: 110px;
+      background: #2A1B11;
+      transform: rotateY(90deg) translateZ(14px);
+      transform-origin: left center;
+    }
+    .shop-awning {
+      left: -7px; top: 0; width: 156px; height: 26px;
+      background: repeating-linear-gradient(90deg, #D9762B 0 18px, #F0B37C 18px 36px);
+      border: 2px solid rgba(253,251,247,.35);
+      transform: rotateX(58deg) translateZ(27px);
+      transform-origin: bottom;
+      box-shadow: 0 8px 12px rgba(0,0,0,.28);
+    }
+    .shop-sign {
+      position:absolute; left: 11px; top: 16px; z-index:2;
+      padding: 3px 9px; border-radius: 3px;
+      background: #F0B37C; color: #3A2619;
+      font: 700 11px/1 "Noto Serif TC", serif;
+      letter-spacing: .12em;
+      box-shadow: 0 0 16px rgba(240,179,124,.62);
+      transform: translateZ(24px);
+    }
+    .shop-door {
+      position:absolute; left: 51px; bottom: 0; width: 43px; height: 76px;
+      overflow:hidden; border: 2px solid rgba(240,179,124,.58);
+      background: linear-gradient(90deg, #160e09, #4A3222 52%, #160e09);
+      box-shadow: inset 0 0 20px rgba(0,0,0,.9), 0 0 18px rgba(240,179,124,.20);
+      transform: translateZ(20px);
+    }
+    .shop-door::before {
+      content:""; position:absolute; inset:0;
+      background: linear-gradient(90deg, transparent 48%, rgba(240,179,124,.35) 50%, transparent 52%);
+      animation: doorway-glow 2.8s ease-in-out infinite alternate;
+    }
+    .shop-window {
+      position:absolute; right: 11px; bottom: 20px; width: 28px; height: 36px;
+      border: 2px solid rgba(240,179,124,.62);
+      background: linear-gradient(135deg, rgba(253,251,247,.48), rgba(217,118,43,.22));
+      transform: translateZ(20px);
+    }
+    .person-3d {
+      --coat: #D9762B; --coat-shadow: #7A5638; --skin: #E7B694;
+      position:absolute; bottom: 23px; width: 46px; height: 100px;
+      z-index: 1; opacity: 0;
+      transform-style: preserve-3d;
+      filter: drop-shadow(0 9px 5px rgba(0,0,0,.34));
+      will-change: transform, opacity;
+    }
+    .person-3d--cream { --coat: #EFE5D6; --coat-shadow: #B8977A; --skin: #BF8B69; }
+    .person-3d--wood { --coat: #7A5638; --coat-shadow: #3A2619; --skin: #E7B694; }
+    .person-3d--ember { --coat: #BC5F1C; --coat-shadow: #7A5638; --skin: #CF9A78; }
+    .person-model { position:absolute; inset:0; transform-style:preserve-3d; animation: person-bob .68s ease-in-out infinite alternate; }
+    .person-shadow {
+      position:absolute; left:-19px; bottom:-5px; width:84px; height:17px;
+      border-radius:50%; background:rgba(0,0,0,.34); filter:blur(3px);
+      transform: rotateX(72deg) translateZ(-16px);
+    }
+    .person-head {
+      position:absolute; left:14px; top:0; width:20px; height:20px; border-radius:50%;
+      background: radial-gradient(circle at 30% 25%, #FFE0C6, var(--skin) 62%, #8D5B45);
+      box-shadow: inset -4px -3px 5px rgba(65,32,18,.32);
+      transform: translateZ(12px);
+    }
+    .person-torso {
+      position:absolute; left:10px; top:21px; width:28px; height:38px; border-radius:8px 8px 4px 4px;
+      background: linear-gradient(100deg, var(--coat), #fff2 37%, var(--coat-shadow));
+      box-shadow: inset -4px 0 5px rgba(0,0,0,.25);
+      transform: translateZ(7px) rotateY(-12deg);
+    }
+    .person-arm, .person-leg {
+      position:absolute; width:8px; border-radius:99px;
+      background: linear-gradient(90deg, var(--coat), var(--coat-shadow));
+      transform-origin: top center; transform-style:preserve-3d;
+    }
+    .person-arm { top:25px; height:34px; animation: limb-swing .68s ease-in-out infinite alternate; }
+    .person-arm--left { left:7px; --limb-z:3px; --limb-angle:18deg; }
+    .person-arm--right { right:7px; --limb-z:10px; --limb-angle:-18deg; animation-direction:alternate-reverse; }
+    .person-leg { top:56px; height:43px; background:linear-gradient(90deg, #4A3222, #1E130C); animation: leg-stride .68s ease-in-out infinite alternate; }
+    .person-leg--left { left:13px; --limb-z:4px; --limb-angle:12deg; }
+    .person-leg--right { right:13px; --limb-z:10px; --limb-angle:-12deg; animation-direction:alternate-reverse; }
+    .person--entering { left:-7%; animation: enter-shop 14s linear -5s infinite; }
+    .person--exiting { left:80%; animation: exit-shop 15s linear -11s infinite; }
+    .person--crossing { left:-8%; bottom:39px; width:31px; height:70px; animation: cross-back 19s linear -13s infinite; }
+    .person--returning { left:96%; bottom:29px; width:37px; height:81px; animation: return-front 21s linear -17s infinite; }
+    @keyframes enter-shop {
+      0% { transform:translate3d(0,0,0) scale(1.12) rotateY(-8deg); opacity:0; }
+      10%, 60% { opacity:1; }
+      78% { transform:translate3d(92vw,-29px,-170px) scale(.32) rotateY(-13deg); opacity:1; }
+      88%, 100% { transform:translate3d(93vw,-31px,-180px) scale(.28) rotateY(-13deg); opacity:0; }
+    }
+    @keyframes exit-shop {
+      0%, 8% { transform:translate3d(0,-31px,-180px) scale(.28) rotateY(-13deg); opacity:0; }
+      18% { opacity:1; }
+      88% { transform:translate3d(-92vw,0,0) scale(1.12) rotateY(9deg); opacity:1; }
+      100% { transform:translate3d(-95vw,0,0) scale(1.16) rotateY(9deg); opacity:0; }
+    }
+    @keyframes cross-back { from { transform:translate3d(0,-14px,-115px) scale(.56); opacity:0; } 10%,88% { opacity:.72; } to { transform:translate3d(111vw,-14px,-115px) scale(.56); opacity:0; } }
+    @keyframes return-front { from { transform:translate3d(0,0,10px) scale(.84) rotateY(180deg); opacity:0; } 10%,88% { opacity:.82; } to { transform:translate3d(-111vw,0,10px) scale(.84) rotateY(180deg); opacity:0; } }
+    @keyframes person-bob { from { transform:translateY(0) rotateX(0deg); } to { transform:translateY(-3px) rotateX(2deg); } }
+    @keyframes limb-swing { from { transform:translateZ(var(--limb-z)) rotate(calc(var(--limb-angle) - 14deg)); } to { transform:translateZ(var(--limb-z)) rotate(calc(var(--limb-angle) + 14deg)); } }
+    @keyframes leg-stride { from { transform:translateZ(var(--limb-z)) rotate(calc(var(--limb-angle) - 12deg)); } to { transform:translateZ(var(--limb-z)) rotate(calc(var(--limb-angle) + 12deg)); } }
+    @keyframes doorway-glow { from { opacity:.35; } to { opacity:.9; } }
+    @media (max-width:640px) {
+      .people-scene { perspective:580px; perspective-origin:85% 100%; }
+      .shop-3d { right:2%; transform:scale(.78) rotateY(-19deg) rotateX(3deg); transform-origin:bottom right; }
+      .person--crossing, .person--returning { display:none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .person-3d, .person-model, .person-arm, .person-leg, .shop-door::before { animation:none; }
+      .person--entering { left:47%; transform:scale(.55); opacity:1; }
+      .person--exiting { left:18%; transform:scale(.78); opacity:1; }
+      .person--crossing, .person--returning { display:none; }
+    }
     body.lock { overflow:hidden; }
   </style>
 </head>
@@ -142,7 +294,54 @@
            alt="剛起鍋的金黃鍋貼" class="fallback absolute inset-0 -z-20 h-full w-full object-cover" onerror="this.removeAttribute('src')" />
       <div class="absolute inset-0 -z-10 bg-gradient-to-r from-wood-900/90 via-wood-900/65 to-wood-900/20"></div>
 
-      <div class="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 pt-24 pb-16">
+      <!-- 3D 門市：行人以透視景深走入、走出店門 -->
+      <div class="people-scene pointer-events-none absolute inset-x-0 bottom-0 z-0 h-52 overflow-hidden" aria-hidden="true">
+        <div class="scene-floor"></div>
+        <div class="shop-3d">
+          <div class="shop-front">
+            <span class="shop-sign">金禾</span>
+            <span class="shop-door"></span>
+            <span class="shop-window"></span>
+          </div>
+          <div class="shop-side"></div>
+          <div class="shop-awning"></div>
+        </div>
+
+        <div class="person-3d person--entering person-3d--ember">
+          <span class="person-shadow"></span>
+          <div class="person-model">
+            <span class="person-head"></span><span class="person-torso"></span>
+            <span class="person-arm person-arm--left"></span><span class="person-arm person-arm--right"></span>
+            <span class="person-leg person-leg--left"></span><span class="person-leg person-leg--right"></span>
+          </div>
+        </div>
+        <div class="person-3d person--exiting person-3d--cream">
+          <span class="person-shadow"></span>
+          <div class="person-model">
+            <span class="person-head"></span><span class="person-torso"></span>
+            <span class="person-arm person-arm--left"></span><span class="person-arm person-arm--right"></span>
+            <span class="person-leg person-leg--left"></span><span class="person-leg person-leg--right"></span>
+          </div>
+        </div>
+        <div class="person-3d person--crossing person-3d--wood">
+          <span class="person-shadow"></span>
+          <div class="person-model">
+            <span class="person-head"></span><span class="person-torso"></span>
+            <span class="person-arm person-arm--left"></span><span class="person-arm person-arm--right"></span>
+            <span class="person-leg person-leg--left"></span><span class="person-leg person-leg--right"></span>
+          </div>
+        </div>
+        <div class="person-3d person--returning">
+          <span class="person-shadow"></span>
+          <div class="person-model">
+            <span class="person-head"></span><span class="person-torso"></span>
+            <span class="person-arm person-arm--left"></span><span class="person-arm person-arm--right"></span>
+            <span class="person-leg person-leg--left"></span><span class="person-leg person-leg--right"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="relative z-10 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 pt-24 pb-16">
         <div class="max-w-2xl">
           <p class="mb-5 inline-flex items-center gap-2 rounded-full border border-cream-50/30 bg-white/5 px-4 py-1.5 text-xs tracking-[.25em] text-cream-100 backdrop-blur">
             <span class="h-1.5 w-1.5 rounded-full bg-ember-400"></span>SINCE 1996 · 三十年手藝
@@ -164,7 +363,7 @@
         </div>
       </div>
 
-      <a href="#story" class="absolute bottom-6 left-1/2 -translate-x-1/2 text-cream-100/70 hover:text-cream-50 animate-bounce" aria-label="向下捲動">
+      <a href="#story" class="absolute bottom-6 left-1/2 z-10 -translate-x-1/2 text-cream-100/70 hover:text-cream-50 animate-bounce" aria-label="向下捲動">
         <i data-lucide="chevrons-down" class="h-7 w-7"></i>
       </a>
     </section>
