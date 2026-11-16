@@ -740,7 +740,10 @@
           <div class="flex justify-between pt-2 text-lg font-bold"><span>應付總額</span><span id="sumTotal" class="text-ember-600"></span></div>
         </div>
 
-        <button type="submit" class="mt-6 w-full rounded-full bg-ember-500 py-4 font-bold text-white hover:bg-ember-600 transition">確認送出訂單</button>
+        <!-- honeypot：真人看不到，機器人會填 -->
+        <input id="fWebsite" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;opacity:0" />
+
+        <button type="submit" class="mt-6 w-full rounded-full bg-ember-500 disabled:cursor-wait disabled:opacity-60 py-4 font-bold text-white hover:bg-ember-600 transition">確認送出訂單</button>
         <p class="mt-3 text-center text-xs text-wood-500">此為示範結帳流程，不會實際扣款。</p>
       </form>
 
@@ -1127,8 +1130,26 @@
       $('#sumTotal').textContent = money(subtotal() + packFee() + shipFee());
     }
 
+    /* ---------- 訂單送到 Google Sheet（GAS Web App） ----------
+       部署 gas/Code.gs 後，把「網頁應用程式網址」貼到下方；留空則維持示範模式（不送出）。 */
+    const ORDER_API = 'https://script.google.com/macros/s/AKfycbzdAIA0kluZkSIy1TvPfbr1X-R3UM4Jhj3DK-q7P67C-r8CE5S6KEHRqufhOvJXm_KU/exec';
+    let clientId = null;   // 同一張訂單重送共用同一個 ID，後端據此防重複
+    const newClientId = () => (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2, 12));
+
+    async function sendOrder(payload) {
+      const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), 20000);
+      try {
+        // 用 text/plain 避免 CORS preflight（GAS 不支援 OPTIONS）
+        const res = await fetch(ORDER_API, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload), signal: ctl.signal });
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.message || '訂單送出失敗');
+        return data;
+      } finally { clearTimeout(timer); }
+    }
+
     function openCheckout(mode) {
       if (!cart.length) return;
+      clientId = newClientId();
       closeCart();
       form.classList.remove('hidden');
       success.classList.add('hidden');
@@ -1155,7 +1176,7 @@
       return !bad;
     }
 
-    form.addEventListener('submit', e => {
+    form.addEventListener('submit', async e => {
       e.preventDefault();
       const name = $('#fName'), phone = $('#fPhone'), addr = $('#fAddr');
       let ok = setError(name, !name.value.trim());
@@ -1166,9 +1187,28 @@
 
       // 產生訂單資訊
       const mode = currentMode();
-      const total = subtotal() + packFee() + shipFee();
+      let total = subtotal() + packFee() + shipFee();
       const d = new Date();
-      const orderNo = 'GH' + d.getFullYear().toString().slice(2) + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0') + '-' + Math.floor(1000 + Math.random() * 9000);
+      let orderNo = 'GH' + d.getFullYear().toString().slice(2) + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0') + '-' + Math.floor(1000 + Math.random() * 9000);
+
+      // 送到 Google Sheet；失敗時保留購物車與表單，讓使用者重試（不會重複建單）
+      if (ORDER_API) {
+        const btn = $('button[type="submit"]', form), label = btn.textContent;
+        btn.disabled = true; btn.textContent = '送出中…';
+        try {
+          const res = await sendOrder({
+            clientId, mode, storeId: $('#fStore').value,
+            name: name.value.trim(), phone: phone.value, addr: addr.value.trim(), note: $('#fNote').value.trim(),
+            items: cart.map(i => ({ id: i.id, qty: i.qty })),
+            source: matchMedia('(display-mode: standalone)').matches ? 'pwa' : 'web',
+            website: $('#fWebsite').value
+          });
+          orderNo = res.orderNo; total = res.total;
+        } catch (err) {
+          toast(err.name === 'AbortError' ? '連線逾時，請檢查網路後再按一次送出' : '訂單送出失敗：' + err.message, 'alert-circle');
+          return;
+        } finally { btn.disabled = false; btn.textContent = label; }
+      }
       let eta;
       if (mode === 'delivery') {
         const arrive = new Date(d.getTime() + 3 * 864e5);
