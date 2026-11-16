@@ -11,13 +11,14 @@ class Sheet {
     setDataValidation(){return rg},insertCheckboxes(){return rg}};return rg;}
   appendRow(a){this.rows.push(a);} setFrozenRows(){} setColumnWidths(){} setColumnWidth(){}
 }
+const book = {getSheetByName:n=>sheets[n]||null,insertSheet:n=>sheets[n]=new Sheet(n)};
 const ctx = {console, Date, JSON, Math, Number, String, Array, Object, RegExp,
-  SpreadsheetApp:{getActiveSpreadsheet:()=>({getSheetByName:n=>sheets[n]||null,insertSheet:n=>sheets[n]=new Sheet(n)}),flush(){},
+  SpreadsheetApp:{getActiveSpreadsheet:()=>global.__unbound?null:book,openById:id=>{if(id!=='SID123')throw new Error('bad id');return book;},flush(){},
     newDataValidation:()=>({requireValueInList(){return this},setAllowInvalid(){return this},build(){return{}}})},
   LockService:{getScriptLock:()=>({waitLock(){},releaseLock(){}})},
   Utilities:{formatDate:(d,tz,f)=>{const p=n=>String(n).padStart(2,'0');return f==='yyMMdd'?p(d.getFullYear()%100)+p(d.getMonth()+1)+p(d.getDate()):d.toISOString().slice(0,10)}},
   MailApp:{sendEmail:m=>mails.push(m)},
-  PropertiesService:{getScriptProperties:()=>({getProperty:()=>'owner@example.com'})},
+  PropertiesService:{getScriptProperties:()=>({getProperty:k=>k==='SHEET_ID'?(global.__sid||null):'owner@example.com'})},
   ContentService:{MimeType:{JSON:'json'},createTextOutput:s=>({s,setMimeType(){return this}})}};
 vm.createContext(ctx); vm.runInContext(fs.readFileSync(__dirname+'/../gas/Code.gs','utf8'), ctx);
 const post = o => JSON.parse(ctx.doPost({postData:{contents:JSON.stringify(o)}}).s);
@@ -47,4 +48,10 @@ for (const [bad, why] of [[{...base,clientId:'abcdefgh-4',phone:'123'},'phone'],
 const st = JSON.parse(ctx.doGet({parameter:{action:'status',orderNo:r.orderNo,phone:'0912345678'}}).s);
 assert.ok(st.ok && st.status==='新訂單');
 assert.strictEqual(JSON.parse(ctx.doGet({parameter:{action:'status',orderNo:r.orderNo,phone:'0900000000'}}).s).ok, false);
+// 獨立專案（未綁定試算表）：沒有 SHEET_ID 要明確報錯，設定後可正常寫入
+global.__unbound = true;
+const noId = post({...base, clientId:'abcdefgh-9'});
+assert.strictEqual(noId.ok, false); assert.match(noId.message, /SHEET_ID/);
+global.__sid = 'SID123';
+assert.ok(post({...base, clientId:'abcdefgh-9'}).ok);
 console.log('GAS tests passed');

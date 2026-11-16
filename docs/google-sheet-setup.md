@@ -15,7 +15,7 @@
 2. 選單 **擴充功能 → Apps Script**，把 `gas/Code.gs` 全部貼進 `Code.gs`。
    （要用 `appsscript.json`：專案設定 → 勾「顯示 appsscript.json」後貼上。）
 3. 儲存後在編輯器執行一次 `setup`，授權（Google 會警告「未驗證」→ 進階 → 前往）。
-4. 專案設定 → **指令碼屬性** → 新增 `NOTIFY_EMAIL` = 你的 Email（不設就不寄信）。
+4. 專案設定 → **指令碼屬性** → 若 Apps Script 是獨立建立（不是從試算表的「擴充功能」開的），新增 `SHEET_ID` = 試算表網址 `/d/` 與 `/edit` 之間那串 ID；再新增 `NOTIFY_EMAIL` = 你的 Email（不設就不寄信）。
 5. 重新整理試算表，選單 **金禾訂單 → 安裝每日報表**。
 6. **部署 → 新增部署作業 → 網頁應用程式**：執行身分「我」、存取權「所有人」→ 複製 `…/exec` 網址。
 7. 把網址貼進 `index.html` 的 `const ORDER_API = '';`，推上 GitHub Pages。
