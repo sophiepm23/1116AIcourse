@@ -9,6 +9,8 @@
  *  4. 防公式注入、honeypot 擋機器人、欄位長度限制。
  */
 
+const DEFAULT_SHEET_ID = '1Wou05-vNnfj3b2q4ol_mcD-MyafkCHdyY0HCZSdOoek'; // 結帳系統試算表（可被指令碼屬性 SHEET_ID 覆寫）
+
 const CFG = {
   ORDERS: '訂單',
   ITEMS: '訂單明細',
@@ -177,7 +179,7 @@ function lookupStatus_(orderNo, phone) {
 
 /** 取得試算表：優先用指令碼屬性 SHEET_ID（獨立專案必須），否則用綁定的試算表 */
 function ss_() {
-  const id = PropertiesService.getScriptProperties().getProperty('SHEET_ID');
+  const id = PropertiesService.getScriptProperties().getProperty('SHEET_ID') || DEFAULT_SHEET_ID;
   const ss = id ? SpreadsheetApp.openById(id) : SpreadsheetApp.getActiveSpreadsheet();
   if (!ss) throw new Error('找不到試算表：請在「專案設定 → 指令碼屬性」新增 SHEET_ID');
   return ss;
