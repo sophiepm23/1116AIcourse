@@ -175,8 +175,16 @@ function lookupStatus_(orderNo, phone) {
 
 /* ========================= 工作表工具 ========================= */
 
+/** 取得試算表：優先用指令碼屬性 SHEET_ID（獨立專案必須），否則用綁定的試算表 */
+function ss_() {
+  const id = PropertiesService.getScriptProperties().getProperty('SHEET_ID');
+  const ss = id ? SpreadsheetApp.openById(id) : SpreadsheetApp.getActiveSpreadsheet();
+  if (!ss) throw new Error('找不到試算表：請在「專案設定 → 指令碼屬性」新增 SHEET_ID');
+  return ss;
+}
+
 function getSheet_(name, headers) {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ss = ss_();
   let sh = ss.getSheetByName(name);
   if (!sh) {
     sh = ss.insertSheet(name);
